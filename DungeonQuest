@@ -1,0 +1,32 @@
+_G.keepDistance = true -- if true, keep a certain distance from the boss
+_G.distanceThreshold = 15 -- the distance threshold to keep from the boss
+
+function keepDistanceFromBoss()
+  local character = game:GetService("Players").LocalPlayer.Character
+  local humanoidRootPart = character.HumanoidRootPart
+  local target = _G.target
+
+  if target and target.Parent and target.Parent:FindFirstChild("HumanoidRootPart") then
+    local targetRootPart = target.Parent.HumanoidRootPart
+    local distance = (targetRootPart.Position - humanoidRootPart.Position).Magnitude
+
+    if distance < _G.distanceThreshold then
+      local direction = (humanoidRootPart.Position - targetRootPart.Position).Unit
+      local newPosition = targetRootPart.Position + direction * _G.distanceThreshold
+      humanoidRootPart.CFrame = CFrame.new(newPosition)
+    end
+  end
+end
+
+function startBossFight()
+  if _G.doInstakill then
+    game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer("Equip", "Superhuman Strength")
+  end
+
+  if _G.keepDistance then
+    while _G.boss_raid do
+        keepDistanceFromBoss()
+        wait()
+    end
+  end
+end
